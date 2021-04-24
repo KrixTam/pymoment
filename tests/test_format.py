@@ -215,6 +215,10 @@ class TestFormat(unittest.TestCase):
         self.assertEqual(a.format('llll'), 'Thu, Apr 22, 2021 3:19 AM')
         self.assertEqual(b.format('llll'), 'Sat, Oct 2, 2021 2:22 PM')
 
+    def test_escape(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        self.assertEqual(a.format('[Today is] dddd.'), 'Today is Thursday.')
+
 
 if __name__ == '__main__':
     unittest.main()

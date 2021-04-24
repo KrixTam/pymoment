@@ -8,18 +8,6 @@ from dateutil.parser import parse
 import math
 
 
-# from string import Formatter
-#
-#
-# class MomentFormatter(Formatter):
-#
-#     def convert_field(self, value, conversion):
-
-# ordinal = lambda n: "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1)*(n % 10 < 4) * n % 10::4])
-# ORDINAL = [ordinal(n) for n in range(1, 367)]
-# ORDINAL.insert(0, '0th')
-
-
 def generateOrdinal(num):
     ordinal = []
     for n in range(1, num + 1):
@@ -272,12 +260,6 @@ class moment(object):
             # Day of Week(ISO)
             'E': str(self._d.isoweekday()),
             # Week of Year
-            # moment('2021-01-04').format('w')
-            #     "2"
-            # moment('2021-01-03').format('w')
-            #     "2"
-            # moment('2021-01-02').format('w')
-            #     "1"
             'w': str(week_number),
             'wo': ORDINAL[week_number],
             'ww': moment.zeroFill(week_number),
@@ -358,5 +340,8 @@ class moment(object):
                 if item in self._s:
                     results.append(self._s[item])
                 else:
-                    results.append(item)
+                    if ('[' == item[0]) and (']' == item[-1]):
+                        results.append(item[1:-1])
+                    else:
+                        results.append(item)
             return ''.join(results)

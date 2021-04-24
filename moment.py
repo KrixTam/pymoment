@@ -49,14 +49,49 @@ class moment(object):
                         raise TypeError('Unknown type of object for generate the moment object.')
         self._generateDict()
 
+    def __eq__(self, other):
+        if isinstance(other, moment):
+            return self._d == other._d
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, moment):
+            return self._d < other._d
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, moment):
+            return self._d > other._d
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, moment):
+            return self._d <= other._d
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, moment):
+            return self._d >= other._d
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, moment):
+            return not (self.__eq__(self, other))
+        else:
+            return NotImplemented
+
     def toDatetime(self):
-        return datetime(self._d.year, self._d.month, self._d.day, self._d.hour, self._d.minute, self._d.second,
-                        self._d.microsecond, self._d.tzinfo)
+        return datetime(self._d.year, self._d.month, self._d.day, self._d.hour, self._d.minute, self._d.second, self._d.microsecond, self._d.tzinfo)
 
     def add(self, *args):
         tmp = len(args)
         if 1 == tmp:
-            #
+            # ToDo: duration and dict are to be supported.
             raise TypeError('function missing required arguments')
         else:
             if 2 == tmp:
@@ -150,7 +185,24 @@ class moment(object):
                                                 else:
                                                     raise ValueError('metric "' + metric + '" is not supported.')
             else:
-                raise TypeError('function missing required arguments')
+                raise TypeError('too many arguments')
+
+    def subtract(self, *args):
+        tmp = len(args)
+        if 1 == tmp:
+            # ToDo: duration and dict are to be supported.
+            raise TypeError('function missing required arguments')
+        else:
+            if 2 == tmp:
+                num = args[0]
+                metric = args[1]
+                if isinstance(num, float) or isinstance(num, int):
+                    new_num = num * (-1)
+                    return self.add(new_num, metric)
+                else:
+                    raise ValueError('number should be integer or float.')
+            else:
+                raise TypeError('too many arguments')
 
     def getLocaleFirstDayOfWeek(self):
         return self._week['dow']

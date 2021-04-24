@@ -6,6 +6,10 @@ To install pymoment, please download the whl file, then install with the *pip* c
 
 > pip install pymoment-*.whl
 
+or just install:
+
+> pip install pymoment
+
 Then import the package for your code:
 
 > from moment import moment
@@ -71,9 +75,9 @@ Once parsing and manipulation are done, you need some way to display the moment.
 
 This is the most robust display option. It takes a string of tokens and replaces them with their corresponding values.
 
-> moment().format();
+> moment().format()
 > 
-> moment().format(String);
+> moment().format(String)
 
 | |Token|Output|
 |---|---|---|
@@ -145,3 +149,50 @@ To escape characters in format strings, you can wrap the characters in square br
 > 
 > 'Today is Thursday.'
 
+## Manipulate
+
+### Add
+
+> moment().add(Number, String)
+
+Mutates the original moment by adding time.
+
+This is a pretty robust function for adding time to an existing moment. To add time, pass the key of what time you want to add, and the amount you want to add.
+
+> moment().add(7, 'days')
+
+There are some shorthand keys as well if you're into that whole brevity thing.
+
+> moment().add(7, 'd')
+
+|Key|Shorthand|
+|---|---|
+|years|y|
+|quarters|Q|
+|months|M|
+|weeks|w|
+|days|d|
+|hours|h|
+|minutes|m|
+|seconds|s|
+|milliseconds|ms|
+
+If the day of the month on the original date is greater than the number of days in the final month, the day of the month will change to the last day in the final month.
+
+> moment('2010-01-31').add(1, 'months') # 2010-02-28
+
+When decimal values are passed for days and months, they are rounded to the nearest integer. Weeks, quarters, and years are converted to days or months, and then rounded to the nearest integer.
+
+> moment('2010-01-31').add(1.5, 'months') == moment('2010-01-31').add(2, 'months')
+> 
+> moment('2010-01-31').add(.7, 'years') == moment('2010-01-31').add(8, 'months') # .7*12 = 8.4, rounded to 8
+
+### Subtract
+
+> moment().subtract(Number, String)
+
+Mutates the original moment by subtracting time.
+
+This is exactly the same as *moment().add*, only instead of adding time, it subtracts time.
+
+> moment().subtract(7, 'days')

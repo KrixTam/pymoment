@@ -667,6 +667,93 @@ class moment(object):
                                             else:
                                                 raise ValueError('Unknown metric for getting the star unit of the moment object')
 
+    def endOf(self, metric: str, inplace=False):
+        if 'year' == metric:
+            new_d = datetime(self._d.year, 12, 31, 23, 59, 59, 999999)
+            if inplace:
+                self.setDatetime(new_d)
+            return moment(new_d)
+        else:
+            if 'month' == metric:
+                day = calendar.monthrange(self._d.year, self._d.month)[1]
+                new_d = datetime(self._d.year, self._d.month, day, 23, 59, 59, 999999)
+                if inplace:
+                    self.setDatetime(new_d)
+                return moment(new_d)
+            else:
+                if 'quarter' == metric:
+                    month = int(self._s['Q']) * 3
+                    day = calendar.monthrange(self._d.year, month)[1]
+                    new_d = datetime(self._d.year, month, day, 23, 59, 59, 999999)
+                    if inplace:
+                        self.setDatetime(new_d)
+                    return moment(new_d)
+                else:
+                    if 'week' == metric:
+                        dow = self.getLocaleFirstDayOfWeek()
+                        if 0 == dow:
+                            dow = 7
+                        weekday = self._d.isoweekday()
+                        days_num = dow - weekday - 7
+                        if weekday >= dow:
+                            days_num = dow - weekday
+                        days_num = days_num + 6
+                        new_d = self._d + timedelta(days=days_num)
+                        new_d = datetime(new_d.year, new_d.month, new_d.day, 23, 59, 59, 999999)
+                        if inplace:
+                            self.setDatetime(new_d)
+                        return moment(new_d)
+                    else:
+                        if 'isoWeek' == metric:
+                            if 1 == self._d.isoweekday():
+                                new_d = datetime(self._d.year, self._d.month, self._d.day, 23, 59, 59, 999999)\
+                                        + timedelta(days=6)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                            else:
+                                days_num = 1 - self._d.isoweekday() + 6
+                                new_d = self._d + timedelta(days=days_num)
+                                new_d = datetime(new_d.year, new_d.month, new_d.day, 23, 59, 59, 999999)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                        else:
+                            if 'day' == metric:
+                                new_d = datetime(self._d.year, self._d.month, self._d.day, 23, 59, 59, 999999)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                            else:
+                                if 'date' == metric:
+                                    new_d = datetime(self._d.year, self._d.month, self._d.day, 23, 59, 59, 999999)
+                                    if inplace:
+                                        self.setDatetime(new_d)
+                                    return moment(new_d)
+                                else:
+                                    if 'hour' == metric:
+                                        new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour,
+                                                         59, 59, 999999)
+                                        if inplace:
+                                            self.setDatetime(new_d)
+                                        return moment(new_d)
+                                    else:
+                                        if 'minute' == metric:
+                                            new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour,
+                                                             self._d.minute, 59, 999999)
+                                            if inplace:
+                                                self.setDatetime(new_d)
+                                            return moment(new_d)
+                                        else:
+                                            if 'second' == metric:
+                                                new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour,
+                                                                 self._d.minute, self._d.second, 999999)
+                                                if inplace:
+                                                    self.setDatetime(new_d)
+                                                return moment(new_d)
+                                            else:
+                                                raise ValueError('Unknown metric for getting the star unit of the moment object')
+
     def locale(self, week: dict):
         if 'dow' in week:
             self._week['dow'] = week['dow']

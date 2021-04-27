@@ -477,6 +477,15 @@ If *inplace* is *True*, the original moment instance should be updated to the st
 > 
 > moment().startOf('second')   # same as moment().milliseconds(0)
 
+### End of Time
+
+> moment().endOf(String, inplace=False)
+
+Mutates the original moment by setting it to the end of a unit of time.
+
+This is the same as *moment.startOf*, only instead of setting to the start of a unit of time, it sets to the end of a unit of time.
+
+
 ## Customize
 
 ### First Day of Week and First Week of Year
@@ -485,6 +494,6 @@ If *inplace* is *True*, the original moment instance should be updated to the st
 > 
 > moment().locale(week)
 
-*week['dow']* should be an integer representing the first day of the week, 0 is Sunday, 1 is Monday, ..., 6 is Saturday.
+*week['dow']* should be an integer representing the first day of the week, 0 is Sunday, 1 is Monday, ..., 6 is Saturday. Default is 0.
 
-*week['doy']* should be an integer. *doy* is used together with *dow* to determine the first week of the year. *doy* is calculated as *7 + dow - janX*, where *janX* is the first day of January that must belong to the first week of the year.
+*week['doy']* should be an integer. *doy* is used together with *dow* to determine the first week of the year. *doy* is calculated as *7 + dow - janX*, where *janX* is the first day of January that must belong to the first week of the year. Default is 6.

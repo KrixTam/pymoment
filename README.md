@@ -176,6 +176,227 @@ To escape characters in format strings, you can wrap the characters in square br
 > 
 > 'Today is Thursday.'
 
+## Get + Set
+
+Calling all methods without parameters acts as a getter, and calling them with a parameter acts as a setter.
+
+### Millisecond
+
+> moment().millisecond(Number)
+> 
+> moment().millisecond()  # Number
+> 
+> moment().milliseconds(Number)
+> 
+> moment().milliseconds()  # Number
+
+Gets or sets the milliseconds.
+
+Accepts numbers from 0 to 999. If the range is exceeded, it will bubble up to the seconds.
+
+### Second
+
+> moment().second(Number)
+> 
+> moment().second()  # Number
+> 
+> moment().seconds(Number)
+> 
+> moment().seconds()  # Number
+
+Gets or sets the seconds.
+
+Accepts numbers from 0 to 59. If the range is exceeded, it will bubble up to the minutes.
+
+### Minutes
+
+> moment().minute(Number)
+> 
+> moment().minute()  # Number
+> 
+> moment().minutes(Number)
+> 
+> moment().minutes()  # Number
+
+Gets or sets the minutes.
+
+Accepts numbers from 0 to 59. If the range is exceeded, it will bubble up to the hour.
+
+### Hour
+
+> moment().hour(Number)
+> 
+> moment().hour()  # Number
+> 
+> moment().hours(Number)
+> 
+> moment().hours()  # Number
+
+Gets or sets the hour.
+
+Accepts numbers from 0 to 23. If the range is exceeded, it will bubble up to the day.
+
+### Date of Month
+
+> moment().date(Number)
+> 
+> moment().date()  # Number
+> 
+> moment().dates(Number)
+> 
+> moment().dates()  # Number
+
+Gets or sets the day of the month.
+
+Accepts numbers from 1 to 31. If the range is exceeded, it will bubble up to the months.
+
+**Note**: *moment.date* is for the date of the month, and *moment.day* is for the day of the week.
+
+### Day of Week
+
+> moment().day(Number)
+> 
+> moment().day()  # Number
+> 
+> moment().days(Number)
+> 
+> moment().days()  # Number
+
+Gets or sets the day of the week.
+
+This method can be used to set the day of the week, with Sunday as 0 and Saturday as 6.
+
+If the value given is from 0 to 6, the resulting date will be within the current (Sunday-to-Saturday) week.
+
+If the range is exceeded, it will bubble up to other weeks.
+
+**Note**: *moment.date* is for the date of the month, and *moment.day* is for the day of the week.
+
+### Day of Week (Locale Aware)
+
+> moment().weekday(Number)
+> 
+> moment().weekday()  # Number
+
+> moment().weekday(Number)
+> 
+> moment().weekday() # Number
+
+Gets or sets the day of the week according to the locale.
+
+If the locale assigns Monday as the first day of the week, moment().weekday(0) will be Monday. If Sunday is the first day of the week, moment().weekday(0) will be Sunday.
+
+### Day of Week (Locale Aware)
+
+> moment().isoWeekday(Number)
+> moment().isoWeekday()  # Number
+
+Gets or sets the ISO day of the week with 1 being Monday and 7 being Sunday.
+
+As with moment#day, if the range is exceeded, it will bubble up to other weeks.
+
+### Day of Year
+
+> moment().dayOfYear(Number)
+> 
+> moment().dayOfYear()  # Number
+
+Gets or sets the day of the year.
+
+Accepts numbers from 1 to 366. If the range is exceeded, it will bubble up to the years.
+
+### Week of Year
+
+> moment().week(Number)
+> 
+> moment().week()  # Number
+> 
+> moment().weeks(Number)
+> 
+> moment().weeks()  # Number
+
+Gets or sets the week of the year.
+
+Because different locales define week of year numbering differently, use *moment.local* to set the localized week of the year.
+
+The week of the year varies depending on which day is the first day of the week (Sunday, Monday, etc), and which week is the first week of the year.
+
+For example, in the United States, Sunday is the first day of the week. The week with January 1st in it is the first week of the year.
+
+In France, Monday is the first day of the week, and the week with January 4th is the first week of the year.
+
+The output of *moment.week* will depend on the locale for that moment.
+
+When setting the week of the year, the day of the week is retained.
+
+### Week of Year (ISO)
+
+> moment().isoWeek(Number)
+> 
+> moment().isoWeek()  # Number
+> 
+> moment().isoWeeks(Number)
+> 
+> moment().isoWeeks()  # Number
+
+Gets or sets the [ISO week of the year](https://en.wikipedia.org/wiki/ISO_week_date).
+
+When setting the week of the year, the day of the week is retained.
+
+### Month
+
+> moment().month(Number)
+> 
+> moment().month()  # Number
+> 
+> moment().months(Number)
+> 
+> moment().months()  # Number
+
+Gets or sets the month.
+
+Accepts numbers from 0 to 11. If the range is exceeded, it will bubble up to the year.
+
+**Note**: Months are zero indexed, so January is month 0.
+
+### Quarter
+
+> moment().quarter()  # Number
+> 
+> moment().quarter(Number)
+> 
+> moment().quarters()  # Number
+> 
+> moment().quarters(Number)
+
+Gets the quarter (1 to 4) and sets the quarter with parameter *Number*.
+
+If the range is exceeded, it will bubble up to other quarters.
+
+### Year
+
+> moment().year(Number)
+> 
+> moment().year()  # Number
+> 
+> moment().years(Number)
+> 
+> moment().years()  # Number
+
+Gets or sets the year. According to *datetime.MINYEAR*, parameter *Number* should larger than zero.
+
+### Weeks In Year
+
+> moment().weeksInYear()
+
+Gets the number of weeks according to locale in the current moment's year.
+
+### Weeks In Year (ISO)
+
+> moment().isoWeeksInYear()
+
+Gets the number of weeks in the current moment's year, according to [ISO weeks](https://en.wikipedia.org/wiki/ISO_week_date).
+
 ## Manipulate
 
 ### Add
@@ -256,3 +477,14 @@ If *inplace* is *True*, the original moment instance should be updated to the st
 > 
 > moment().startOf('second')   # same as moment().milliseconds(0)
 
+## Customize
+
+### First Day of Week and First Week of Year
+
+> week = { 'dow': int, 'doy': int }
+> 
+> moment().locale(week)
+
+*week['dow']* should be an integer representing the first day of the week, 0 is Sunday, 1 is Monday, ..., 6 is Saturday.
+
+*week['doy']* should be an integer. *doy* is used together with *dow* to determine the first week of the year. *doy* is calculated as *7 + dow - janX*, where *janX* is the first day of January that must belong to the first week of the year.

@@ -354,8 +354,8 @@ class moment(object):
             'Wo': ORDINAL[iso_week_number],
             'WW': moment.zeroFill(iso_week_number),
             # Year
-            'YY': str(self._d.year)[2:],
-            'YYYY': str(self._d.year),
+            'YY': moment.zeroFill(int(moment.zeroFill(self._d.year, 4)[-2:])),
+            'YYYY': moment.zeroFill(self._d.year, 4),
             # YYYYYY Expanded Years is not supported
             # Y is not supported
             # Era Year is not supported
@@ -464,7 +464,7 @@ class moment(object):
 
     def hour(self, num: int = None):
         if num is None:
-            return self._d.minute
+            return self._d.hour
         else:
             new_d = self._d.replace(hour=0) + timedelta(hours=num)
             self.setDatetime(new_d)
@@ -483,38 +483,31 @@ class moment(object):
         return self.date(num)
 
     def day(self, num: int = None):
+        weekday = self._d.isoweekday() % 7
         if num is None:
-            return self._d.isoweekday() % 7
+            return weekday
         else:
-            dow = 7
-            weekday = self._d.isoweekday()
-            start_of_week_offset = dow - weekday
-            if weekday < dow:
-                start_of_week_offset = dow - weekday - 7
-            days_offset = start_of_week_offset + num
-            self.add(days_offset, 'd', inplace=True)
+            day_num = num - weekday
+            self.add(day_num, 'd', inplace=True)
 
     def days(self, num: int = None):
         return self.day(num)
 
     def weekday(self, num: int = None):
+        weekday = (7 + self._d.isoweekday() - self._week['dow']) % 7
         if num is None:
-            return self._d.weekday()
+            return weekday
         else:
-            self.startOf('week', inplace=True)
-            self.add(num, 'd', inplace=True)
+            day_num = num - weekday
+            self.add(day_num, 'd', inplace=True)
 
     def isoWeekday(self, num: int = None):
+        weekday = self._d.isoweekday()
         if num is None:
-            return self._d.isoweekday()
+            return weekday
         else:
-            dow = 7
-            weekday = self._d.isoweekday()
-            start_of_week_offset = dow - weekday
-            if weekday < dow:
-                start_of_week_offset = dow - weekday - 7
-            days_offset = start_of_week_offset + num
-            self.add(days_offset, 'd', inplace=True)
+            day_num = num - weekday
+            self.add(day_num, 'd', inplace=True)
 
     def dayOfYear(self, num: int = None):
         if num is None:
@@ -524,26 +517,73 @@ class moment(object):
             self.setDatetime(new_d)
 
     def week(self, num: int = None):
+        week = int(self._s['w'])
         if num is None:
-            return int(self._s['w'])
+            return week
         else:
-            # ToDo
-            new_d = self._d.replace(month=1, day=1) + timedelta(days=num - 1)
-            self.setDatetime(new_d)
+            day_num = (num - week) * 7
+            self.add(day_num, 'd', inplace=True)
 
     def weeks(self, num: int = None):
         return self.week(num)
 
     def isoWeek(self, num: int = None):
+        week = int(self._s['W'])
         if num is None:
-            return int(self._s['W'])
+            return week
         else:
-            # ToDo
-            new_d = self._d.replace(month=1, day=1) + timedelta(days=num - 1)
-            self.setDatetime(new_d)
+            day_num = (num - week) * 7
+            self.add(day_num, 'd', inplace=True)
 
     def isoWeeks(self, num: int = None):
         return self.isoWeek(num)
+
+    def month(self, num: int = None):
+        month = self._d.month - 1
+        if num is None:
+            return month
+        else:
+            month_num = num - month
+            self.add(month_num, 'M', inplace=True)
+
+    def months(self, num: int = None):
+        return self.month(num)
+
+    def quarter(self, num: int = None):
+        quarter = int(self._s['Q'])
+        if num is None:
+            return quarter
+        else:
+            quarter_num = num - quarter
+            self.add(quarter_num, 'Q', inplace=True)
+
+    def quarters(self, num: int = None):
+        return self.quarter(num)
+
+    def year(self, num: int = None):
+        if num is None:
+            return self._d.year
+        else:
+            if num > 0:
+                new_d = self._d.replace(year=num)
+                self.setDatetime(new_d)
+            else:
+                raise ValueError('year 0 is out of range')
+
+    def years(self, num: int = None):
+        return self.year(num)
+
+    def weeksInYear(self):
+        result = int(moment([self._d.year, 12, 31]).format('w'))
+        if 1 == result:
+            result = int(moment([self._d.year, 12, 31]).add(-7, 'd').format('w'))
+        return result
+
+    def isoWeeksInYear(self):
+        result = int(moment([self._d.year, 12, 31]).format('W'))
+        if 1 == result:
+            result = int(moment([self._d.year, 12, 31]).add(-7, 'd').format('W'))
+        return result
 
     def startOf(self, metric: str, inplace=False):
         if 'year' == metric:
@@ -626,3 +666,9 @@ class moment(object):
                                                 return moment(new_d)
                                             else:
                                                 raise ValueError('Unknown metric for getting the star unit of the moment object')
+
+    def locale(self, week: dict):
+        if 'dow' in week:
+            self._week['dow'] = week['dow']
+        if 'doy' in week:
+            self._week['doy'] = week['doy']

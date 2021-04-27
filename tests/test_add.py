@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import unittest
 from moment import moment
 
@@ -85,6 +87,12 @@ class TestAdd(unittest.TestCase):
         self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2020-12-31 12:00:00.007000')
         self.assertEqual(b.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2020-12-31 11:44:47.681000')
         self.assertEqual(c.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-01-01 05:18:41.321000')
+
+    def test_inplace(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        b = a.add(53, 's', inplace=True)
+        self.assertEqual(a, b)
+        self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-04-22 04:03:02.957000')
 
 
 if __name__ == '__main__':

@@ -18,8 +18,9 @@ Then import the package for your code:
 |---|---|---|
 |None|moment()|Get the current date and time|
 |moment|moment(m)|Create a new moment object with the moment object "m"|
-|datetime.datetime|moment(datetime.datetime.now())|Create a moment object with the datetime object "d"|
+|datetime.datetime|moment(d)|Create a moment object with the datetime object "d"|
 |str|moment('2021-04-12')|Parsing the string to a moment object|
+|list|moment([2021, 4, 12])|Parsing the list to a moment object|
 
 ## Parse
 
@@ -27,9 +28,15 @@ Then import the package for your code:
 
 > now = moment()
 > 
+> now = moment([])
+>  
 > now = moment(datetime.datetime.now())
 
 ### String
+
+> moment(String)
+
+You can create a moment from a string. The following are examples of strings in supported formats.
 
 > 2013-02-08               # Date only
 > 
@@ -66,6 +73,26 @@ With time zone:
 > 2021-04-22 04 +0800
 > 
 > 20210422 04:02:09 +0800
+
+### List
+
+> moment([2021, 4, 12])
+
+You can create a moment with a list of numbers that mirror the parameters passed to datetime.
+
+> [ year, month=1, day=1, hour=0, minute=0, second=0, microsecond=0 ]
+
+Any parameter except "year" will default to the lowest possible number.
+
+> moment([2010])        # January 1st
+> 
+> moment([2010, 6])     # July 1st
+> 
+> moment([2010, 6, 10]) # July 10th
+
+If an empty list is passed, you could get the current date time.
+
+> moment([])
 
 ## Display
 
@@ -153,9 +180,9 @@ To escape characters in format strings, you can wrap the characters in square br
 
 ### Add
 
-> moment().add(Number, String)
+> moment().add(Number, String, inplace=False)
 
-Mutates the original moment by adding time.
+Mutates the original moment by adding time and return a new moment instance as a result.
 
 This is a pretty robust function for adding time to an existing moment. To add time, pass the key of what time you want to add, and the amount you want to add.
 
@@ -164,6 +191,8 @@ This is a pretty robust function for adding time to an existing moment. To add t
 There are some shorthand keys as well if you're into that whole brevity thing.
 
 > moment().add(7, 'd')
+
+If *inplace* is *True*, the original moment instance should be updated by the adding operation.
 
 |Key|Shorthand|
 |---|---|
@@ -189,10 +218,41 @@ When decimal values are passed for days and months, they are rounded to the near
 
 ### Subtract
 
-> moment().subtract(Number, String)
+> moment().subtract(Number, String, inplace=False)
 
-Mutates the original moment by subtracting time.
+Mutates the original moment by subtracting time and return a new moment instance as a result.
 
 This is exactly the same as *moment().add*, only instead of adding time, it subtracts time.
 
 > moment().subtract(7, 'days')
+
+If *inplace* is *True*, the original moment instance should be updated by the subtracting operation.
+
+### Start of Time
+
+> moment().startOf(String, inplace=False)
+
+Mutates the original moment by setting it to the start of a unit of time.
+
+If *inplace* is *True*, the original moment instance should be updated to the start of a unit of time.
+
+> moment().startOf('year')     # set to January 1st, 12:00 am this year
+> 
+> moment().startOf('month')    # set to the first of this month, 12:00 am
+> 
+> moment().startOf('quarter')  # set to the beginning of the current quarter, 1st day of months, 12:00 am
+> 
+> moment().startOf('week')     # set to the first day of this week, 12:00 am
+> 
+> moment().startOf('isoWeek')  # set to the first day of this week according to ISO 8601, 12:00 am
+> 
+> moment().startOf('day')      # set to 12:00 am today
+> 
+> moment().startOf('date')     # set to 12:00 am today
+> 
+> moment().startOf('hour')     # set to now, but with 0 mins, 0 secs, and 0 ms
+> 
+> moment().startOf('minute')   # set to now, but with 0 seconds and 0 milliseconds
+> 
+> moment().startOf('second')   # same as moment().milliseconds(0)
+

@@ -46,7 +46,24 @@ class moment(object):
                     if isinstance(m, moment):
                         self._d = m.toDatetime()
                     else:
-                        raise TypeError('Unknown type of object for generate the moment object.')
+                        if isinstance(m, list):
+                            dt_args = m.copy()
+                            length = len(dt_args)
+                            if (length > 0) and (length < 9):
+                                if 1 == length:
+                                    dt_args.append(1)
+                                    dt_args.append(1)
+                                else:
+                                    if 2 == length:
+                                        dt_args.append(1)
+                                self._d = datetime(*dt_args)
+                            else:
+                                if 0 == length:
+                                    self._d = datetime.now()
+                                else:
+                                    raise ValueError('When the parameter of the construction function is a list, the number of parameters in the list is out of range(1, 8).')
+                        else:
+                            raise TypeError('Unknown type of object for generate the moment object.')
         self._generateDict()
 
     def __eq__(self, other):
@@ -81,14 +98,19 @@ class moment(object):
 
     def __ne__(self, other):
         if isinstance(other, moment):
-            return not (self.__eq__(self, other))
+            return not (self.__eq__(other))
         else:
             return NotImplemented
 
     def toDatetime(self):
-        return datetime(self._d.year, self._d.month, self._d.day, self._d.hour, self._d.minute, self._d.second, self._d.microsecond, self._d.tzinfo)
+        return datetime(self._d.year, self._d.month, self._d.day, self._d.hour, self._d.minute, self._d.second,
+                        self._d.microsecond, self._d.tzinfo)
 
-    def add(self, *args):
+    def setDatetime(self, d):
+        self._d = d
+        self._generateDict()
+
+    def add(self, *args, inplace=False):
         tmp = len(args)
         if 1 == tmp:
             # ToDo: duration and dict are to be supported.
@@ -102,50 +124,56 @@ class moment(object):
                     if isinstance(days_num, float):
                         days_num = round(days_num)
                     if isinstance(days_num, int):
-                        return moment(self._d + timedelta(days=days_num))
+                        new_d = self._d + timedelta(days=days_num)
+                        if inplace:
+                            self.setDatetime(new_d)
+                        return moment(new_d)
                     else:
                         raise ValueError('number should be integer or float.')
                 else:
                     if ('hours' == metric) or ('h' == metric):
                         if isinstance(num, int):
-                            return moment(self._d + timedelta(hours=num))
+                            new_d = self._d + timedelta(hours=num)
+                            if inplace:
+                                self.setDatetime(new_d)
+                            return moment(new_d)
                         else:
                             raise ValueError('number should be integer.')
                     else:
                         if ('minutes' == metric) or ('m' == metric):
                             if isinstance(num, int):
-                                return moment(self._d + timedelta(minutes=num))
+                                new_d = self._d + timedelta(minutes=num)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
                             else:
                                 raise ValueError('number should be integer.')
                         else:
                             if ('seconds' == metric) or ('s' == metric):
                                 if isinstance(num, int):
-                                    return moment(self._d + timedelta(seconds=num))
+                                    new_d = self._d + timedelta(seconds=num)
+                                    if inplace:
+                                        self.setDatetime(new_d)
+                                    return moment(new_d)
                                 else:
                                     raise ValueError('number should be integer.')
                             else:
                                 if ('milliseconds' == metric) or ('ms' == metric):
                                     if isinstance(num, int):
-                                        return moment(self._d + timedelta(milliseconds=num))
+                                        new_d = self._d + timedelta(milliseconds=num)
+                                        if inplace:
+                                            self.setDatetime(new_d)
+                                        return moment(new_d)
                                     else:
                                         raise ValueError('number should be integer.')
                                 else:
                                     if ('years' == metric) or ('y' == metric):
-                                        # d = self._d.date()
-                                        # new_d = None
-                                        # try:
-                                        #     new_d = d.replace(year=d.year + num)
-                                        # except ValueError:
-                                        #     new_d = d + (date(d.year + num, 3, 1) - date(d.year, 3, 1))
-                                        # new_dt = datetime(new_d.year, new_d.month, new_d.day, self._d.hour,
-                                        #                   self._d.minute, self._d.second, self._d.microsecond,
-                                        #                   self._d.tzinfo)
-                                        # return moment(new_dt)
                                         months = num * 12
                                         if isinstance(months, float):
                                             months = round(months)
                                         if isinstance(months, int):
-                                            return self.add(months, 'M')
+                                            new_args = [months, 'M']
+                                            return self.add(*new_args, inplace=inplace)
                                         else:
                                             raise ValueError('number should be integer or float.')
                                     else:
@@ -154,7 +182,8 @@ class moment(object):
                                             if isinstance(months, float):
                                                 months = round(months)
                                             if isinstance(months, int):
-                                                return self.add(months, 'M')
+                                                new_args = [months, 'M']
+                                                return self.add(*new_args, inplace=inplace)
                                             else:
                                                 raise ValueError('number should be integer or float.')
                                         else:
@@ -167,10 +196,12 @@ class moment(object):
                                                     year = self._d.year + month // 12
                                                     month = month % 12 + 1
                                                     day = min(self._d.day, calendar.monthrange(year, month)[1])
-                                                    return moment(datetime(year, month, day, self._d.hour,
+                                                    new_d = datetime(year, month, day, self._d.hour,
                                                                            self._d.minute, self._d.second,
-                                                                           self._d.microsecond,
-                                                                           self._d.tzinfo))
+                                                                           self._d.microsecond, self._d.tzinfo)
+                                                    if inplace:
+                                                        self.setDatetime(new_d)
+                                                    return moment(new_d)
                                                 else:
                                                     raise ValueError('number should be integer or float.')
                                             else:
@@ -179,7 +210,8 @@ class moment(object):
                                                     if isinstance(days_num, float):
                                                         days_num = round(days_num)
                                                     if isinstance(days_num, int):
-                                                        return self.add(days_num, 'd')
+                                                        new_args = [days_num, 'd']
+                                                        return self.add(*new_args, inplace=inplace)
                                                     else:
                                                         raise ValueError('number should be integer or float.')
                                                 else:
@@ -187,7 +219,7 @@ class moment(object):
             else:
                 raise TypeError('too many arguments')
 
-    def subtract(self, *args):
+    def subtract(self, *args, inplace=False):
         tmp = len(args)
         if 1 == tmp:
             # ToDo: duration and dict are to be supported.
@@ -198,7 +230,8 @@ class moment(object):
                 metric = args[1]
                 if isinstance(num, float) or isinstance(num, int):
                     new_num = num * (-1)
-                    return self.add(new_num, metric)
+                    new_args = [new_num, metric]
+                    return self.add(*new_args, inplace=inplace)
                 else:
                     raise ValueError('number should be integer or float.')
             else:
@@ -237,10 +270,9 @@ class moment(object):
 
     @staticmethod
     def getFirstWeekOffset(year, dow, doy):
-        # fwd = 7 + self._week['dow'] - self._week['doy']
-        # fwdlw = (7 + datetime(self._d.year, 1, 1).isoweekday() - self._week['dow']) % 7
-        # week_offset = fwd - fwdlw - 1
+        # first-week day -- which january is always in the first week (4 for iso, 1 for other)
         fwd = 7 + dow - doy
+        # first-week day local weekday -- which local weekday is fwd
         fwdlw = (7 + datetime(year, 1, fwd).isoweekday() - dow) % 7
         week_offset = fwd - fwdlw - 1
         return week_offset
@@ -261,7 +293,6 @@ class moment(object):
         else:
             sign_str = '-'
         t = '%0' + str(target_length) + 'd'
-        # return "%02d" % (num,)
         num_str = t % (abs_num,)
         return sign_str + num_str
 
@@ -283,7 +314,10 @@ class moment(object):
             tz = strftime("%z", gmtime())
         tzz = tz
         tz = tz[:3] + ':' + tz[3:]
-        unix_timestamp = self._d.timestamp()
+        try:
+            unix_timestamp = self._d.timestamp()
+        except OSError:
+            unix_timestamp = (self._d - datetime(1970, 1, 1)).total_seconds()
         d = {
             # Month
             'M': str(self._d.month),
@@ -387,7 +421,7 @@ class moment(object):
             matches = re.split(moment.format_regex, input_string)
             items = [y for y in [x for x in matches if x is not ''] if y is not None]
             results = []
-            self._generateDict()
+            # self._generateDict()
             for item in items:
                 if item in self._s:
                     results.append(self._s[item])
@@ -397,3 +431,198 @@ class moment(object):
                     else:
                         results.append(item)
             return ''.join(results)
+
+    def millisecond(self, num: int = None):
+        if num is None:
+            return int(self._s['SSS'])
+        else:
+            new_d = self._d.replace(microsecond=0) + timedelta(milliseconds=num)
+            self.setDatetime(new_d)
+
+    def milliseconds(self, num: int = None):
+        return self.millisecond(num)
+
+    def second(self, num: int = None):
+        if num is None:
+            return self._d.second
+        else:
+            new_d = self._d.replace(second=0) + timedelta(seconds=num)
+            self.setDatetime(new_d)
+
+    def seconds(self, num: int = None):
+        return self.second(num)
+
+    def minute(self, num: int = None):
+        if num is None:
+            return self._d.minute
+        else:
+            new_d = self._d.replace(minute=0) + timedelta(minutes=num)
+            self.setDatetime(new_d)
+
+    def minutes(self, num: int = None):
+        return self.minute(num)
+
+    def hour(self, num: int = None):
+        if num is None:
+            return self._d.minute
+        else:
+            new_d = self._d.replace(hour=0) + timedelta(hours=num)
+            self.setDatetime(new_d)
+
+    def hours(self, num: int = None):
+        return self.hour(num)
+
+    def date(self, num: int = None):
+        if num is None:
+            return self._d.day
+        else:
+            new_d = self._d.replace(day=1) + timedelta(days=num-1)
+            self.setDatetime(new_d)
+
+    def dates(self, num: int = None):
+        return self.date(num)
+
+    def day(self, num: int = None):
+        if num is None:
+            return self._d.isoweekday() % 7
+        else:
+            dow = 7
+            weekday = self._d.isoweekday()
+            start_of_week_offset = dow - weekday
+            if weekday < dow:
+                start_of_week_offset = dow - weekday - 7
+            days_offset = start_of_week_offset + num
+            self.add(days_offset, 'd', inplace=True)
+
+    def days(self, num: int = None):
+        return self.day(num)
+
+    def weekday(self, num: int = None):
+        if num is None:
+            return self._d.weekday()
+        else:
+            self.startOf('week', inplace=True)
+            self.add(num, 'd', inplace=True)
+
+    def isoWeekday(self, num: int = None):
+        if num is None:
+            return self._d.isoweekday()
+        else:
+            dow = 7
+            weekday = self._d.isoweekday()
+            start_of_week_offset = dow - weekday
+            if weekday < dow:
+                start_of_week_offset = dow - weekday - 7
+            days_offset = start_of_week_offset + num
+            self.add(days_offset, 'd', inplace=True)
+
+    def dayOfYear(self, num: int = None):
+        if num is None:
+            return int(self._s['DDD'])
+        else:
+            new_d = self._d.replace(month=1, day=1) + timedelta(days=num - 1)
+            self.setDatetime(new_d)
+
+    def week(self, num: int = None):
+        if num is None:
+            return int(self._s['w'])
+        else:
+            # ToDo
+            new_d = self._d.replace(month=1, day=1) + timedelta(days=num - 1)
+            self.setDatetime(new_d)
+
+    def weeks(self, num: int = None):
+        return self.week(num)
+
+    def isoWeek(self, num: int = None):
+        if num is None:
+            return int(self._s['W'])
+        else:
+            # ToDo
+            new_d = self._d.replace(month=1, day=1) + timedelta(days=num - 1)
+            self.setDatetime(new_d)
+
+    def isoWeeks(self, num: int = None):
+        return self.isoWeek(num)
+
+    def startOf(self, metric: str, inplace=False):
+        if 'year' == metric:
+            new_d = datetime(self._d.year, 1, 1)
+            if inplace:
+                self.setDatetime(new_d)
+            return moment(new_d)
+        else:
+            if 'month' == metric:
+                new_d = datetime(self._d.year, self._d.month, 1)
+                if inplace:
+                    self.setDatetime(new_d)
+                return moment(new_d)
+            else:
+                if 'quarter' == metric:
+                    month = (int(self._s['Q']) - 1) * 3 + 1
+                    new_d = datetime(self._d.year, month, 1)
+                    if inplace:
+                        self.setDatetime(new_d)
+                    return moment(new_d)
+                else:
+                    if 'week' == metric:
+                        dow = self.getLocaleFirstDayOfWeek()
+                        if 0 == dow:
+                            dow = 7
+                        weekday = self._d.isoweekday()
+                        days_num = dow - weekday - 7
+                        if weekday >= dow:
+                            days_num = dow - weekday
+                        new_d = self._d + timedelta(days=days_num)
+                        new_d = datetime(new_d.year, new_d.month, new_d.day)
+                        if inplace:
+                            self.setDatetime(new_d)
+                        return moment(new_d)
+                    else:
+                        if 'isoWeek' == metric:
+                            if 1 == self._d.isoweekday():
+                                new_d = datetime(self._d.year, self._d.month, self._d.day)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                            else:
+                                days_num = 1 - self._d.isoweekday()
+                                new_d = self._d + timedelta(days=days_num)
+                                new_d = datetime(new_d.year, new_d.month, new_d.day)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                        else:
+                            if 'day' == metric:
+                                new_d = datetime(self._d.year, self._d.month, self._d.day)
+                                if inplace:
+                                    self.setDatetime(new_d)
+                                return moment(new_d)
+                            else:
+                                if 'date' == metric:
+                                    new_d = datetime(self._d.year, self._d.month, self._d.day)
+                                    if inplace:
+                                        self.setDatetime(new_d)
+                                    return moment(new_d)
+                                else:
+                                    if 'hour' == metric:
+                                        new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour)
+                                        if inplace:
+                                            self.setDatetime(new_d)
+                                        return moment(new_d)
+                                    else:
+                                        if 'minute' == metric:
+                                            new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour,
+                                                             self._d.minute)
+                                            if inplace:
+                                                self.setDatetime(new_d)
+                                            return moment(new_d)
+                                        else:
+                                            if 'second' == metric:
+                                                new_d = datetime(self._d.year, self._d.month, self._d.day, self._d.hour,
+                                                                 self._d.minute, self._d.second)
+                                                if inplace:
+                                                    self.setDatetime(new_d)
+                                                return moment(new_d)
+                                            else:
+                                                raise ValueError('Unknown metric for getting the star unit of the moment object')

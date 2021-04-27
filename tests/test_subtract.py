@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import unittest
 from moment import moment
 
@@ -39,6 +41,12 @@ class TestSubtract(unittest.TestCase):
     def test_millisecond(self):
         self.assertTrue(moment('20201231T12').subtract(7321321, 'ms') == moment('20201231T12').add(-7321321, 'milliseconds'))
         self.assertTrue(moment('20201231T12').subtract(-3123, 'milliseconds') == moment('20201231T12').add(3123, 'ms'))
+
+    def test_inplace(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        b = a.subtract(13, 's', inplace=True)
+        self.assertEqual(a, b)
+        self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-04-22 04:01:56.957000')
 
 
 if __name__ == '__main__':

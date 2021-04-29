@@ -22,6 +22,7 @@ Then import the package for your code:
 |str|moment('2021-04-12')|Parsing the string to a moment object|
 |list|moment([2021, 4, 12])|Parsing the list to a moment object|
 
+
 ## Parse
 
 ### Now
@@ -93,6 +94,7 @@ Any parameter except "year" will default to the lowest possible number.
 If an empty list is passed, you could get the current date time.
 
 > moment([])
+
 
 ## Display
 
@@ -175,6 +177,7 @@ To escape characters in format strings, you can wrap the characters in square br
 > moment('2021-04-22 04:02:09.957000 +0800').format('[Today is] dddd.')
 > 
 > 'Today is Thursday.'
+
 
 ## Get + Set
 
@@ -397,6 +400,34 @@ Gets the number of weeks according to locale in the current moment's year.
 
 Gets the number of weeks in the current moment's year, according to [ISO weeks](https://en.wikipedia.org/wiki/ISO_week_date).
 
+### Unix Timestamp
+
+> moment().unix()
+
+*moment.unix* outputs a Unix timestamp (the number of seconds since the Unix Epoch).
+
+This value is floored to the nearest second, and does not include a milliseconds component.
+
+### Days in Month
+
+> moment().daysInMonth()
+
+Get the number of days in the current month.
+
+> moment('20200213').daysInMonth()  # 29
+> 
+> moment('20210813').daysInMonth()  # 31
+
+### Days in Year
+
+> moment().daysInYear()
+
+Get the number of days in the current year.
+
+> moment('20200213').daysInYear()  # 366
+> 
+> moment('20210413').daysInYear()  # 365
+
 ## Manipulate
 
 ### Add
@@ -484,6 +515,183 @@ If *inplace* is *True*, the original moment instance should be updated to the st
 Mutates the original moment by setting it to the end of a unit of time.
 
 This is the same as *moment.startOf*, only instead of setting to the start of a unit of time, it sets to the end of a unit of time.
+
+
+### Operator
+
+"+" and "-" are supported.
+
+While doing "-" operation, *timedelta* is the result of the operation.
+
+> (moment('20201228') - moment('20201225')) == timedelta(days=3)
+
+While doing "+" operation, *timedelta* is added to the moment instance and returning a new moment instance.
+
+The followings should get the same result.
+
+> moment('20201228') + timedelta(days=3)
+> 
+> moment('20201228').add(3, 'd')
+
+## Query
+
+### Is Before
+
+> moment().isBefore(moment|str|datetime|list)
+> 
+> moment().isBefore(moment|str|datetime|list, str)
+> 
+> moment().isBefore(moment|str|datetime|list, str, bool)
+
+Check if a moment is before another moment. The first argument will be parsed as a moment, if not already so.
+
+> moment('2010-10-20').isBefore('2010-10-21')  # True
+
+If the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+> moment('2010-10-20').isBefore('2010-12-31', 'year')  # False
+> 
+> moment('2010-10-20').isBefore('2010-12-31', 'year', True)  # True
+
+Like *moment.isAfter* and *moment.isSame*, any of the units of time that are supported for *moment.startOf* are supported for *moment.isBefore*.
+
+> year quarter month week isoWeek day date hour minute second
+
+### Is Same
+
+> moment().isSame(moment|str|datetime|list)
+> 
+> moment().isSame(moment|str|datetime|list, str)
+> 
+> moment().isSame(moment|str|datetime|list, str, bool)
+
+Check if a moment is the same as another moment. The first argument will be parsed as a moment, if not already so.
+
+> moment('2010-10-20').isSame('2010-10-20')  # True
+
+Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+### Is After
+
+> moment().isAfter(moment|str|datetime|list)
+> 
+> moment().isAfter(moment|str|datetime|list, str)
+> 
+> moment().isAfter(moment|str|datetime|list, str, bool)
+
+Check if a moment is after another moment. The first argument will be parsed as a moment, if not already so.
+
+> moment('2010-10-20').isAfter('2010-10-19')  # True
+
+Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+### Is Same or Before
+
+> moment().isSameOrBefore(moment|str|datetime|list)
+> 
+> moment().isSameOrBefore(moment|str|datetime|list, str)
+> 
+> moment().isSameOrBefore(moment|str|datetime|list, str, bool)
+
+Check if a moment is before or the same as another moment. The first argument will be parsed as a moment, if not already so.
+
+> moment('2010-10-20').isSameOrBefore('2010-10-21')  # True
+> 
+> moment('2010-10-20').isSameOrBefore('2010-10-20')  # True
+> 
+> moment('2010-10-20').isSameOrBefore('2010-10-19')  # True
+
+Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+> a = moment('2021-04-22 04:02:09.957000 +0800')
+> 
+> b = moment('2021-2-2 13:02:09.957000 +0800')
+> 
+> a.isSameOrBefore(b, 'year')  # False
+> 
+> a.isSameOrBefore(b, 'year', True)  #True
+
+### Is Same or After
+
+> moment().isSameOrAfter(moment|str|datetime|list)
+> 
+> moment().isSameOrAfter(moment|str|datetime|list, str)
+> 
+> moment().isSameOrAfter(moment|str|datetime|list, str, bool)
+
+Check if a moment is after or the same as another moment. The first argument will be parsed as a moment, if not already so.
+
+> moment('2010-10-20').isSameOrAfter('2010-10-19')  # True
+> 
+> moment('2010-10-20').isSameOrAfter('2010-10-20')  # True
+> 
+> moment('2010-10-20').isSameOrAfter('2010-10-21')  # False
+
+Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+> a = moment('2021-04-22 04:02:09.957000 +0800')
+> 
+> b = moment('2021-2-2 13:02:09.957000 +0800')
+> 
+> a.isSameOrAfter(b, 'year')  # True
+> 
+> a.isSameOrAfter(b, 'year', True)  # False
+
+###Is Between
+
+> moment().isBetween(moment|str|datetime|list, moment|str|datetime|list)
+> 
+> moment().isBetween(moment|str|datetime|list, moment|str|datetime|list, str)
+> 
+> moment().isBetween(moment|str|datetime|list, moment|str|datetime|list, str, bool)
+
+Check if a moment is between two other moments, optionally looking at unit scale (minutes, hours, days, etc). The match is exclusive. The first two arguments will be parsed as moments, if not already so.
+
+> moment('2010-10-20').isBetween('2010-10-19', '2010-10-25')  # True
+
+Note that the order of the two arguments **do not** matter.
+
+> moment('2010-10-20').isBetween('2010-10-19', '2010-10-25')  # True
+
+> moment('2010-10-20').isBetween('2010-10-25', '2010-10-19')  # True
+
+Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+
+The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+
+> a = moment('20210426')
+> 
+> b = moment('20210429')
+> 
+> c = moment('20210502')
+> 
+> a.isBetween(b, c, 'week')  # True
+> 
+> b.isBetween(a, c, 'week', True)  # False
+
+### Is Leap Year
+
+> moment().isLeapYear()
+> 
+> moment().isLeap()
+ 
+*moment.isLeapYear* and *moment.isLeap* return true if that year is a leap year, and false if it is not.
+
+> moment([2020]).isLeapYear()  # True
+> 
+> moment([2020]).isLeap()  # True
+> 
+> moment([2021]).isLeap()  # False
 
 
 ## Customize

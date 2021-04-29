@@ -34,17 +34,22 @@ class moment(object):
             'dow': 0,  # Sunday is the first day of the week.
             'doy': 6  # The week that contains Jan 6th is the first week of the year.
         }
+        tz = strftime("%z", gmtime())
+        tz = tz[:3] + ':' + tz[3:]
         if m is None:
-            self._d = datetime.now()
+            self._parseDatetime(datetime.now(), tz)
         else:
             if isinstance(m, datetime):
-                self._d = datetime(m.year, m.month, m.day, m.hour, m.minute, m.second, m.microsecond, m.tzinfo)
+                d = datetime(m.year, m.month, m.day, m.hour, m.minute, m.second, m.microsecond, m.tzinfo)
+                self._parseDatetime(d, tz)
             else:
                 if isinstance(m, str):
-                    self._d = parse(m)
+                    d = parse(m)
+                    self._parseDatetime(d, tz)
                 else:
                     if isinstance(m, moment):
-                        self._d = m.toDatetime()
+                        d = m.toDatetime()
+                        self._parseDatetime(d, tz)
                     else:
                         if isinstance(m, list):
                             dt_args = m.copy()
@@ -56,10 +61,12 @@ class moment(object):
                                 else:
                                     if 2 == length:
                                         dt_args.append(1)
-                                self._d = datetime(*dt_args)
+                                d = datetime(*dt_args)
+                                self._parseDatetime(d, tz)
                             else:
                                 if 0 == length:
-                                    self._d = datetime.now()
+                                    d = datetime.now()
+                                    self._parseDatetime(d, tz)
                                 else:
                                     raise ValueError('When the parameter of the construction function is a list, the number of parameters in the list is out of range(1, 8).')
                         else:
@@ -102,12 +109,42 @@ class moment(object):
         else:
             return NotImplemented
 
+    def __add__(self, other):
+        if not isinstance(other, timedelta):
+            return NotImplemented
+        d = self._d + other
+        return moment(d)
+
+    def __sub__(self, other):
+        if isinstance(other, moment):
+            return self._d - other._d
+        else:
+            if isinstance(other, datetime):
+                return self._d - other
+            else:
+                if isinstance(other, timedelta):
+                    return self._d - other
+                return NotImplemented
+
+    def __repr__(self):
+        return self.format('[moment]("YYYY-MM-DD HH:mm:ss.SSSSSS Z")')
+
+    def _parseDatetime(self, d, tz_info: str = None):
+        tz = tz_info
+        if tz is None:
+            tz = strftime("%z", gmtime())
+            tz = tz[:3] + ':' + tz[3:]
+        if 0 == len(d.strftime('%z')):
+            self._d = parse(d.strftime('%Y-%m-%d %H:%M:%S.%f ') + tz)
+        else:
+            self._d = d
+
     def toDatetime(self):
         return datetime(self._d.year, self._d.month, self._d.day, self._d.hour, self._d.minute, self._d.second,
                         self._d.microsecond, self._d.tzinfo)
 
     def setDatetime(self, d):
-        self._d = d
+        self._parseDatetime(d)
         self._generateDict()
 
     def add(self, *args, inplace=False):
@@ -196,9 +233,7 @@ class moment(object):
                                                     year = self._d.year + month // 12
                                                     month = month % 12 + 1
                                                     day = min(self._d.day, calendar.monthrange(year, month)[1])
-                                                    new_d = datetime(year, month, day, self._d.hour,
-                                                                           self._d.minute, self._d.second,
-                                                                           self._d.microsecond, self._d.tzinfo)
+                                                    new_d = datetime(year, month, day, self._d.hour, self._d.minute, self._d.second, self._d.microsecond, self._d.tzinfo)
                                                     if inplace:
                                                         self.setDatetime(new_d)
                                                     return moment(new_d)
@@ -414,9 +449,22 @@ class moment(object):
         d['llll'] = d['ddd'] + ', ' + d['lll']
         self._s = d
 
+    def unix(self):
+        try:
+            unix_timestamp = self._d.timestamp()
+        except OSError:
+            unix_timestamp = (self._d - datetime(1970, 1, 1)).total_seconds()
+        return math.floor(unix_timestamp)
+
+    def daysInMonth(self):
+        return calendar.monthrange(self._d.year, self._d.month)[1]
+
+    def daysInYear(self):
+        return moment.getDaysInYear(self._d.year)
+
     def format(self, input_string: str = None) -> str:
         if input_string is None:
-            return self._d.isoformat().split('.')[0]
+            return self.format('YYYY-MM-DDTHH:mm:ssZ')
         else:
             matches = re.split(moment.format_regex, input_string)
             items = [y for y in [x for x in matches if x is not ''] if y is not None]
@@ -759,3 +807,86 @@ class moment(object):
             self._week['dow'] = week['dow']
         if 'doy' in week:
             self._week['doy'] = week['doy']
+
+    def isBefore(self, m, metric: str = None, start_flag=False):
+        m_object = moment(m)
+        if metric is None:
+            return self.__lt__(m_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return this_object < m_object
+            else:
+                this_object = self.endOf(metric)
+                return this_object < m_object
+
+    def isSame(self, m, metric: str = None, start_flag=False):
+        m_object = moment(m)
+        if metric is None:
+            return self.__eq__(m_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return this_object == m_object
+            else:
+                this_object = self.endOf(metric)
+                return this_object == m_object
+
+    def isAfter(self, m, metric: str = None, start_flag=False):
+        m_object = moment(m)
+        if metric is None:
+            return self.__gt__(m_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return this_object > m_object
+            else:
+                this_object = self.endOf(metric)
+                return this_object > m_object
+
+    def isSameOrBefore(self, m, metric: str = None, start_flag=False):
+        m_object = moment(m)
+        if metric is None:
+            return self.__le__(m_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return this_object <= m_object
+            else:
+                this_object = self.endOf(metric)
+                return this_object <= m_object
+
+    def isSameOrAfter(self, m, metric: str = None, start_flag=False):
+        m_object = moment(m)
+        if metric is None:
+            return self.__ge__(m_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return this_object >= m_object
+            else:
+                this_object = self.endOf(metric)
+                return this_object >= m_object
+
+    def isBetween(self, m_from, m_to, metric: str = None, start_flag=False):
+        m_from_object = moment(m_from)
+        m_to_object = moment(m_to)
+        if m_from_object > m_to_object:
+            m_tmp_object = m_from_object
+            m_from_object = m_to_object
+            m_to_object = m_tmp_object
+        if metric is None:
+            return self.__gt__(m_from_object) and self.__lt__(m_to_object)
+        else:
+            if start_flag:
+                this_object = self.startOf(metric)
+                return (this_object > m_from_object) and (this_object < m_to_object)
+            else:
+                this_object = self.endOf(metric)
+                return (this_object > m_from_object) and (this_object < m_to_object)
+
+    def isLeapYear(self):
+        return calendar.isleap(self._d.year)
+
+    def isLeap(self):
+        return self.isLeapYear()

@@ -7,7 +7,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pymoment",
-    version="0.0.5",
+    version="0.0.6",
+    packages=['moment'],
     author="Krix Tam",
     author_email="krix.tam@qq.com",
     description='The python version of "moment" which is made with reference to "moment.js"',

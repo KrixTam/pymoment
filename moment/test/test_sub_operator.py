@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import unittest
 from moment import moment
 from datetime import timedelta
@@ -48,7 +46,7 @@ class TestSubOperator(unittest.TestCase):
         self.assertEqual(b - a, c)
         self.assertEqual(b - d, c)
 
-    def test_hour(self):
+    def test_week(self):
         a = moment('20201228').subtract(5, 'w')
         b = moment('20201228')
         c = timedelta(weeks=5)

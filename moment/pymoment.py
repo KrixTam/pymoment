@@ -1,5 +1,3 @@
-# coding: utf-8
-
 from datetime import datetime, timedelta
 import calendar
 from time import gmtime, strftime
@@ -467,7 +465,7 @@ class moment(object):
             return self.format('YYYY-MM-DDTHH:mm:ssZ')
         else:
             matches = re.split(moment.format_regex, input_string)
-            items = [y for y in [x for x in matches if x is not ''] if y is not None]
+            items = [y for y in [x for x in matches if x != ''] if y is not None]
             results = []
             # self._generateDict()
             for item in items:

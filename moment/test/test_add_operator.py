@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import unittest
 from moment import moment
 from datetime import timedelta

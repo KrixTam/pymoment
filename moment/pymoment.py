@@ -26,6 +26,7 @@ class moment(object):
 
     def __init__(self, m=None):
         super().__init__()
+        self.unix = self._instance_unix
         self._d = None
         self._s = {}
         self._week = {
@@ -115,13 +116,11 @@ class moment(object):
 
     def __sub__(self, other):
         if isinstance(other, moment):
-            return self._d - other._d
+            return self.unix() * 1000 - other.unix() * 1000
         else:
             if isinstance(other, datetime):
-                return self._d - other
+                return self.unix() * 1000 - other.timestamp() * 1000
             else:
-                if isinstance(other, timedelta):
-                    return self._d - other
                 return NotImplemented
 
     def __repr__(self):
@@ -447,12 +446,17 @@ class moment(object):
         d['llll'] = d['ddd'] + ', ' + d['lll']
         self._s = d
 
-    def unix(self):
+    @staticmethod
+    def unix(unix_timestamp: int):
+        return EPOCH_MOMENT.add(unix_timestamp - EPOCH_DEFAULT, 'ms')
+
+    def _instance_unix(self):
         try:
             unix_timestamp = self._d.timestamp()
         except OSError:
             unix_timestamp = (self._d - datetime(1970, 1, 1)).total_seconds()
-        return math.floor(unix_timestamp)
+        # return math.floor(unix_timestamp)
+        return unix_timestamp
 
     def daysInMonth(self):
         return calendar.monthrange(self._d.year, self._d.month)[1]
@@ -614,7 +618,7 @@ class moment(object):
                 new_d = self._d.replace(year=num)
                 self.setDatetime(new_d)
             else:
-                raise ValueError('year 0 is out of range')
+                raise ValueError('The smallest year number is 1')
 
     def years(self, num: int = None):
         return self.year(num)
@@ -888,3 +892,7 @@ class moment(object):
 
     def isLeap(self):
         return self.isLeapYear()
+
+
+EPOCH_DEFAULT = 1608480000
+EPOCH_MOMENT = moment('2020-12-21')

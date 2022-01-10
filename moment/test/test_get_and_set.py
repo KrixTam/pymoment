@@ -1,5 +1,7 @@
+import math
 import unittest
 from moment import moment
+from moment.pymoment import EPOCH_MOMENT
 
 
 class TestGetAndSet(unittest.TestCase):
@@ -158,6 +160,11 @@ class TestGetAndSet(unittest.TestCase):
         self.assertEqual(a.year(), 1)
         self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '0001-04-02 04:02:09.957031')
 
+    def test_error_year(self):
+        with self.assertRaises(ValueError):
+            a = moment()
+            a.year(0)
+
     def test_weeksInYear(self):
         a = moment('2021-4-2 04:02:09.957031 +0800')
         self.assertEqual(a.weeksInYear(), 52)
@@ -169,6 +176,59 @@ class TestGetAndSet(unittest.TestCase):
         self.assertEqual(a.isoWeeksInYear(), 52)
         b = moment([2020, 2, 11])
         self.assertEqual(b.isoWeeksInYear(), 53)
+
+    def test_not_implement_01(self):
+        with self.assertRaises(TypeError):
+            a = moment('2021-4-2 04:02:09.957031 +0800')
+            if a > 1:
+                pass
+
+    def test_not_implement_02(self):
+        with self.assertRaises(TypeError):
+            a = moment('2021-4-2 04:02:09.957031 +0800')
+            if a >= 1:
+                pass
+
+    def test_not_implement_03(self):
+        with self.assertRaises(TypeError):
+            a = moment('2021-4-2 04:02:09.957031 +0800')
+            if a < 1:
+                pass
+
+    def test_not_implement_04(self):
+        with self.assertRaises(TypeError):
+            a = moment('2021-4-2 04:02:09.957031 +0800')
+            if a <= 1:
+                pass
+
+    def test_not_implement_05(self):
+        a = moment('2021-4-2 04:02:09.957031 +0800')
+        self.assertEqual(a.__eq__(1), NotImplemented)
+
+    def test_not_implement_06(self):
+        a = moment('2021-4-2 04:02:09.957031 +0800')
+        self.assertEqual(a.__ne__(1), NotImplemented)
+
+    def test_repr(self):
+        self.assertEqual(EPOCH_MOMENT.__repr__(), 'moment("2020-12-21 00:00:00.000000 +08:00")')
+
+    def test_constructor_01(self):
+        a = moment([2021, 12])
+        b = moment([2021, 12, 1])
+        self.assertEqual(a, b)
+
+    def test_constructor_02(self):
+        a = moment()
+        b = moment([])
+        self.assertEqual(math.floor(b - a), 0)
+
+    def test_error_constructor_01(self):
+        with self.assertRaises(ValueError):
+            a = moment([2011, 11, 11, 1, 1, 1, 1, 0, 0, 0])
+
+    def test_error_constructor_02(self):
+        with self.assertRaises(TypeError):
+            a = moment(2021)
 
 
 if __name__ == '__main__':

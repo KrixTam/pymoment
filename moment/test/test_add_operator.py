@@ -35,6 +35,11 @@ class TestAddOperator(unittest.TestCase):
         b = moment('20201228') + timedelta(weeks=5)
         self.assertEqual(a, b)
 
+    def test_not_implement(self):
+        with self.assertRaises(TypeError):
+            a = moment('2021-4-2 04:02:09.957031 +0800')
+            b = a + 2
+
 
 if __name__ == '__main__':
     unittest.main()

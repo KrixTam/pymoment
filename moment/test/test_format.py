@@ -1,8 +1,12 @@
 import unittest
 from moment import moment
+from moment.pymoment import EPOCH_MOMENT
 
 
 class TestFormat(unittest.TestCase):
+
+    def test_default(self):
+        self.assertEqual(EPOCH_MOMENT.format(), '2020-12-21T00:00:00+08:00')
 
     def test_month(self):
         a = moment('2021-01-12')

@@ -19,6 +19,7 @@ ORDINAL = generateOrdinal(366)
 WEEKDAY_S = 'Su Mo Tu We Th Fr Sa'.split(' ')
 WEEKDAY = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ')
 WEEKDAY_L = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ')
+METRIC = ['days', 'd', 'hours', 'h', 'minutes', 'm', 'seconds', 's', 'milliseconds', 'ms', 'years', 'y', 'quarters', 'Q', 'months', 'M', 'weeks', 'w']
 
 
 class moment(object):
@@ -147,8 +148,24 @@ class moment(object):
     def add(self, *args, inplace=False):
         tmp = len(args)
         if 1 == tmp:
-            # ToDo: duration and dict are to be supported.
-            raise TypeError('function missing required arguments')
+            settings = args[0]
+            if isinstance(settings, dict):
+                if len(settings) == 0:
+                    raise ValueError('dictionary object should contain at least one item.')
+                else:
+                    metric, num = settings.popitem()
+                    if len(settings) == 0:
+                        if metric in METRIC:
+                            return self.add(num, metric, inplace=inplace)
+                        else:
+                            raise ValueError('metric "' + metric + '" is not supported.')
+                    else:
+                        if metric in METRIC:
+                            return self.add(num, metric, inplace=inplace).add(settings, inplace=inplace)
+                        else:
+                            raise ValueError('metric "' + metric + '" is not supported.')
+            else:
+                raise TypeError('object should be dictionary.')
         else:
             if 2 == tmp:
                 num = args[0]

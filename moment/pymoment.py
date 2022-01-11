@@ -271,8 +271,24 @@ class moment(object):
     def subtract(self, *args, inplace=False):
         tmp = len(args)
         if 1 == tmp:
-            # ToDo: duration and dict are to be supported.
-            raise TypeError('function missing required arguments')
+            settings = args[0]
+            if isinstance(settings, dict):
+                if len(settings) == 0:
+                    raise ValueError('dictionary object should contain at least one item.')
+                else:
+                    metric, num = settings.popitem()
+                    if len(settings) == 0:
+                        if metric in METRIC:
+                            return self.subtract(num, metric, inplace=inplace)
+                        else:
+                            raise ValueError('metric "' + metric + '" is not supported.')
+                    else:
+                        if metric in METRIC:
+                            return self.subtract(num, metric, inplace=inplace).subtract(settings, inplace=inplace)
+                        else:
+                            raise ValueError('metric "' + metric + '" is not supported.')
+            else:
+                raise TypeError('object should be dictionary.')
         else:
             if 2 == tmp:
                 num = args[0]

@@ -9,6 +9,7 @@ class TestIsBetween(unittest.TestCase):
         b = moment('20201128')
         c = moment('20210429')
         self.assertTrue(a.isBetween(b, c))
+        self.assertTrue(a.isBetween(c, b))
         self.assertFalse(b.isBetween(a, c))
 
     def test_year(self):

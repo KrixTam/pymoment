@@ -56,6 +56,36 @@ class TestSubtract(unittest.TestCase):
         with self.assertRaises(TypeError):
             a.subtract(13, 's', 1231)
 
+    def test_error_03(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        with self.assertRaises(ValueError):
+            a.subtract({'x': 12})
+
+    def test_error_04(self):
+        with self.assertRaises(ValueError):
+            moment('20201228').subtract({'m': 21, 'x': 12, 'y': 3, 'd': -4})
+
+    def test_error_05(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        with self.assertRaises(ValueError):
+            a.subtract({'x': 12})
+
+    def test_error_06(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        with self.assertRaises(TypeError):
+            a.subtract([])
+
+    def test_error_07(self):
+        a = moment('2021-04-22 04:02:09.957000 +0800')
+        with self.assertRaises(ValueError):
+            a.subtract({})
+
+    def test_dict_01(self):
+        a = moment('20201228').subtract({'y': 3})
+        b = moment('20201228').subtract({'years': -1, 'd': -4})
+        self.assertEqual(a.format('YYYY-MM-DD'), '2017-12-28')
+        self.assertEqual(b.format('YYYY-MM-DD'), '2022-01-01')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -44,9 +44,13 @@ class TestStartOf(unittest.TestCase):
         b = moment('2021-3-29 13:02:09.957000 +0800').startOf('isoWeek')
         c = moment('2021-3-28 20:52:29.957000 +0800')
         c.startOf('isoWeek', inplace=True)
+        d = moment('2021-4-5 04:02:09.957000 +0800')
+        d.startOf('isoWeek', inplace=True)
+        e = a.add(7, 'd')
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
         self.assertEqual(c.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-03-22 00:00:00.000000')
+        self.assertEqual(d, e)
 
     def test_day(self):
         a = moment('2021-4-2 04:02:09.957000 +0800').startOf('day')
@@ -92,6 +96,10 @@ class TestStartOf(unittest.TestCase):
         self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-04-02 04:02:09.000000')
         self.assertEqual(b.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-04-02 13:02:09.000000')
         self.assertEqual(c.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-03-28 20:52:29.000000')
+
+    def test_error(self):
+        with self.assertRaises(ValueError):
+            moment('2021-4-2 04:02:09.957000 +0800').startOf('ms')
 
 
 if __name__ == '__main__':

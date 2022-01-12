@@ -38,7 +38,7 @@ class TestAddOperator(unittest.TestCase):
     def test_not_implement(self):
         with self.assertRaises(TypeError):
             a = moment('2021-4-2 04:02:09.957031 +0800')
-            b = a + 2
+            a + 2
 
 
 if __name__ == '__main__':

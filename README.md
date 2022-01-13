@@ -433,16 +433,22 @@ Get the number of days in the current year.
 ### Add
 
 > moment().add(Number, String, inplace=False)
+> 
+> moment().add(Dictionary)
 
 Mutates the original moment by adding time and return a new moment instance as a result.
 
 This is a pretty robust function for adding time to an existing moment. To add time, pass the key of what time you want to add, and the amount you want to add.
 
 > moment().add(7, 'days')
+> 
+> moment().add({'days': 7})
 
 There are some shorthand keys as well if you're into that whole brevity thing.
 
 > moment().add(7, 'd')
+> 
+> moment().add({'d': 7})
 
 If *inplace* is *True*, the original moment instance should be updated by the adding operation.
 
@@ -471,12 +477,16 @@ When decimal values are passed for days and months, they are rounded to the near
 ### Subtract
 
 > moment().subtract(Number, String, inplace=False)
+> 
+> moment().subtract(Dictionary)
 
 Mutates the original moment by subtracting time and return a new moment instance as a result.
 
 This is exactly the same as *moment().add*, only instead of adding time, it subtracts time.
 
 > moment().subtract(7, 'days')
+> 
+> moment().subtract({'days': 7})
 
 If *inplace* is *True*, the original moment instance should be updated by the subtracting operation.
 

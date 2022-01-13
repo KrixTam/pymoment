@@ -14,8 +14,7 @@ class TestUnix(unittest.TestCase):
     def test_instance_unix_02(self):
         dt = datetime.datetime(1900, 1, 1, 19, 6, 28)
         a = moment(dt)
-        # TODO
-        self.assertEqual(a.unix(), -2208948812.0)
+        self.assertEqual(a.unix(), -2208949155)
 
 
 if __name__ == '__main__':

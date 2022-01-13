@@ -4,6 +4,9 @@ from time import gmtime, strftime
 import re
 from dateutil.parser import parse
 import math
+import time
+
+EPOCH_DATETIME = datetime(1970, 1, 1)
 
 
 def generateOrdinal(num):
@@ -129,10 +132,10 @@ class moment(object):
 
     def __sub__(self, other):
         if isinstance(other, moment):
-            return self.unix() * 1000 - other.unix() * 1000
+            return self.unix_timestamp() * 1000 - other.unix_timestamp() * 1000
         else:
             if isinstance(other, datetime):
-                return self.unix() * 1000 - other.timestamp() * 1000
+                return self.unix_timestamp() * 1000 - other.timestamp() * 1000
             else:
                 return NotImplemented
 
@@ -374,7 +377,7 @@ class moment(object):
         microsecond = self._d.strftime('%f')
         tzz = self._d.strftime('%z')
         tz = tzz[:3] + ':' + tzz[3:]
-        unix_timestamp = self._instance_unix()
+        unix_timestamp = self.unix_timestamp()
         d = {
             # Month
             'M': str(self._d.month),
@@ -477,10 +480,14 @@ class moment(object):
 
     def _instance_unix(self):
         try:
-            unix_timestamp = self._d.timestamp()
-        except OSError:
-            unix_timestamp = (self._d - datetime(1970, 1, 1)).total_seconds()
-        # return math.floor(unix_timestamp)
+            unix_timestamp = int(time.mktime(self._d.timetuple()))
+        except OverflowError:
+            diff = self._d.replace(tzinfo=None) - EPOCH_DATETIME
+            unix_timestamp = diff.days * 24 * 3600 + diff.seconds
+        return unix_timestamp
+
+    def unix_timestamp(self):
+        unix_timestamp = self._instance_unix() + self._d.microsecond / 1000000
         return unix_timestamp
 
     def daysInMonth(self):

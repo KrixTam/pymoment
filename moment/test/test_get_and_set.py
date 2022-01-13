@@ -83,6 +83,12 @@ class TestGetAndSet(unittest.TestCase):
         self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-05-03 12:42:14.000000')
         a.weekday(-4)
         self.assertEqual(a.format('YYYY-MM-DD HH:mm:ss.SSSSSS'), '2021-04-29 12:42:14.000000')
+        self.assertEqual(a.format('w'), '18')
+        self.assertEqual(a.format('W'), '17')
+        a.locale({'doy': 2})
+        a.format('W')
+        self.assertEqual(a.format('w'), '17')
+        self.assertEqual(a.format('W'), '17')
 
     def test_isoWeekday(self):
         a = moment('2021-04-27T12:42:14+08:00')
@@ -176,6 +182,8 @@ class TestGetAndSet(unittest.TestCase):
         self.assertEqual(a.isoWeeksInYear(), 52)
         b = moment([2020, 2, 11])
         self.assertEqual(b.isoWeeksInYear(), 53)
+        c = moment([2019, 1, 2])
+        self.assertEqual(c.isoWeeksInYear(), 52)
 
     def test_not_implement_01(self):
         with self.assertRaises(TypeError):
@@ -229,6 +237,20 @@ class TestGetAndSet(unittest.TestCase):
     def test_error_constructor_02(self):
         with self.assertRaises(TypeError):
             a = moment(2021)
+
+    def test_tz(self):
+        a = moment('2021-4-2 04:02:09.957031 +0000')
+        # for moment.js "a.format()" should return '2021-04-02T12:02:09+08:00'
+        # self.assertEqual(a.format(), '2021-04-02T12:02:09+08:00')
+        # but for this python version, it would return '2021-04-02T04:02:09+00:00'
+        self.assertEqual(a.format(), '2021-04-02T04:02:09+00:00')
+
+    def test_getLocaleFirstDayOfYear(self):
+        a = moment('2021-4-2 04:02:09.957031 +0800')
+        self.assertEqual(a.getLocaleFirstDayOfYear(), 6)
+
+    def test_zerofill(self):
+        a = moment('2021-4-2 04:02:09.95 -2:00')
 
 
 if __name__ == '__main__':

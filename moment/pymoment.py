@@ -14,6 +14,19 @@ def generateOrdinal(num):
     return ordinal
 
 
+def get_local_tz():
+    tz = strftime("%z", gmtime())
+    tz = tz[:3] + ':' + tz[3:]
+    return tz
+
+
+def zeroFill(num, target_length=2):
+    abs_num = abs(num)
+    t = '%0' + str(target_length) + 'd'
+    num_str = t % (abs_num,)
+    return num_str
+
+
 ORDINAL = generateOrdinal(366)
 
 WEEKDAY_S = 'Su Mo Tu We Th Fr Sa'.split(' ')
@@ -34,8 +47,7 @@ class moment(object):
             'dow': 0,  # Sunday is the first day of the week.
             'doy': 6  # The week that contains Jan 6th is the first week of the year.
         }
-        tz = strftime("%z", gmtime())
-        tz = tz[:3] + ':' + tz[3:]
+        tz = get_local_tz()
         if m is None:
             self._parseDatetime(datetime.now(), tz)
         else:
@@ -130,8 +142,7 @@ class moment(object):
     def _parseDatetime(self, d, tz_info: str = None):
         tz = tz_info
         if tz is None:
-            tz = strftime("%z", gmtime())
-            tz = tz[:3] + ':' + tz[3:]
+            tz = get_local_tz()
         if 0 == len(d.strftime('%z')):
             self._d = parse(d.strftime('%Y-%m-%d %H:%M:%S.%f ') + tz)
         else:
@@ -348,19 +359,6 @@ class moment(object):
         week_offset_next = moment.getFirstWeekOffset(year + 1, dow, doy)
         return (moment.getDaysInYear(year) - week_offset + week_offset_next) // 7
 
-    @staticmethod
-    def zeroFill(num, target_length=2, force_sign=False):
-        abs_num = abs(num)
-        sign_str = ''
-        if num >= 0:
-            if force_sign:
-                sign_str = '+'
-        else:
-            sign_str = '-'
-        t = '%0' + str(target_length) + 'd'
-        num_str = t % (abs_num,)
-        return sign_str + num_str
-
     def _generateDict(self):
         quarter = (self._d.month - 1) // 3 + 1
         day_of_year = int(self._d.strftime("%j"))
@@ -374,15 +372,9 @@ class moment(object):
         if 0 == hour_k:
             hour_k = 24
         microsecond = self._d.strftime('%f')
-        tz = self._d.strftime('%z')
-        if 0 == len(tz):
-            tz = strftime("%z", gmtime())
-        tzz = tz
-        tz = tz[:3] + ':' + tz[3:]
-        try:
-            unix_timestamp = self._d.timestamp()
-        except OSError:
-            unix_timestamp = (self._d - datetime(1970, 1, 1)).total_seconds()
+        tzz = self._d.strftime('%z')
+        tz = tzz[:3] + ':' + tzz[3:]
+        unix_timestamp = self._instance_unix()
         d = {
             # Month
             'M': str(self._d.month),
@@ -413,14 +405,14 @@ class moment(object):
             # Week of Year
             'w': str(week_number),
             'wo': ORDINAL[week_number],
-            'ww': moment.zeroFill(week_number),
+            'ww': zeroFill(week_number),
             # Week of Year(ISO)
             'W': str(iso_week_number),
             'Wo': ORDINAL[iso_week_number],
-            'WW': moment.zeroFill(iso_week_number),
+            'WW': zeroFill(iso_week_number),
             # Year
-            'YY': moment.zeroFill(int(moment.zeroFill(self._d.year, 4)[-2:])),
-            'YYYY': moment.zeroFill(self._d.year, 4),
+            'YY': zeroFill(int(zeroFill(self._d.year, 4)[-2:])),
+            'YYYY': zeroFill(self._d.year, 4),
             # YYYYYY Expanded Years is not supported
             # Y is not supported
             # Era Year is not supported
@@ -432,17 +424,17 @@ class moment(object):
             'a': self._d.strftime("%p").lower(),
             # Hour
             'H': str(self._d.hour),
-            'HH': moment.zeroFill(self._d.hour),
+            'HH': zeroFill(self._d.hour),
             'h': str(hour),
-            'hh': moment.zeroFill(hour),
+            'hh': zeroFill(hour),
             'k': str(hour_k),
-            'kk': moment.zeroFill(hour_k),
+            'kk': zeroFill(hour_k),
             # Minute
             'm': str(self._d.minute),
-            'mm': moment.zeroFill(self._d.minute),
+            'mm': zeroFill(self._d.minute),
             # Second
             's': str(self._d.second),
-            'ss': moment.zeroFill(self._d.second),
+            'ss': zeroFill(self._d.second),
             # Fractional Second
             'S': microsecond[0],
             'SS': microsecond[:2],
@@ -460,12 +452,12 @@ class moment(object):
             'x': str(unix_timestamp * 1000).split('.')[0],
             # Localized formats
             # Time
-            'LT': str(hour) + ':' + moment.zeroFill(self._d.minute) + ' ' + self._d.strftime("%p").upper(),
+            'LT': str(hour) + ':' + zeroFill(self._d.minute) + ' ' + self._d.strftime("%p").upper(),
             # Time with seconds
-            'LTS': str(hour) + ':' + moment.zeroFill(self._d.minute) + ':' + moment.zeroFill(
+            'LTS': str(hour) + ':' + zeroFill(self._d.minute) + ':' + zeroFill(
                 self._d.second) + ' ' + self._d.strftime("%p").upper(),
             # Month numeral, day of month, year
-            'L': moment.zeroFill(self._d.month) + '/' + moment.zeroFill(self._d.day) + '/' + str(self._d.year),
+            'L': zeroFill(self._d.month) + '/' + zeroFill(self._d.day) + '/' + str(self._d.year),
             'l': str(self._d.month) + '/' + str(self._d.day) + '/' + str(self._d.year)
         }
         # Month name, day of month, year
@@ -842,6 +834,7 @@ class moment(object):
             self._week['dow'] = week['dow']
         if 'doy' in week:
             self._week['doy'] = week['doy']
+        self._generateDict()
 
     def isBefore(self, m, metric: str = None, start_flag=False):
         m_object = moment(m)

@@ -843,67 +843,52 @@ class moment(object):
             self._week['doy'] = week['doy']
         self._generateDict()
 
-    def isBefore(self, m, metric: str = None, start_flag=False):
-        m_object = moment(m)
+    def isBefore(self, m=None, metric: str = None):
         if metric is None:
+            m_object = moment(m)
             return self.__lt__(m_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return this_object < m_object
-            else:
-                this_object = self.endOf(metric)
-                return this_object < m_object
+            m_object = moment(m).startOf(metric)
+            this_object = self.startOf(metric)
+            return this_object < m_object
 
-    def isSame(self, m, metric: str = None, start_flag=False):
-        m_object = moment(m)
+    def isSame(self, m, metric: str = None):
         if metric is None:
+            m_object = moment(m)
             return self.__eq__(m_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return this_object == m_object
-            else:
-                this_object = self.endOf(metric)
-                return this_object == m_object
+            m_object = moment(m).startOf(metric)
+            this_object = self.startOf(metric)
+            return this_object == m_object
 
-    def isAfter(self, m, metric: str = None, start_flag=False):
-        m_object = moment(m)
+    def isAfter(self, m=None, metric: str = None):
         if metric is None:
+            m_object = moment(m)
             return self.__gt__(m_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return this_object > m_object
-            else:
-                this_object = self.endOf(metric)
-                return this_object > m_object
+            m_object = moment(m).startOf(metric)
+            this_object = self.startOf(metric)
+            return this_object > m_object
 
-    def isSameOrBefore(self, m, metric: str = None, start_flag=False):
-        m_object = moment(m)
+    def isSameOrBefore(self, m=None, metric: str = None):
         if metric is None:
+            m_object = moment(m)
             return self.__le__(m_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return this_object <= m_object
-            else:
-                this_object = self.endOf(metric)
-                return this_object <= m_object
+            m_object = moment(m).startOf(metric)
+            this_object = self.startOf(metric)
+            return this_object <= m_object
 
-    def isSameOrAfter(self, m, metric: str = None, start_flag=False):
-        m_object = moment(m)
+    def isSameOrAfter(self, m=None, metric: str = None):
         if metric is None:
+            m_object = moment(m)
             return self.__ge__(m_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return this_object >= m_object
-            else:
-                this_object = self.endOf(metric)
-                return this_object >= m_object
+            m_object = moment(m).startOf(metric)
+            this_object = self.startOf(metric)
+            return this_object >= m_object
 
-    def isBetween(self, m_from, m_to, metric: str = None, start_flag=False):
+    def isBetween(self, m_from, m_to, metric: str = None):
         m_from_object = moment(m_from)
         m_to_object = moment(m_to)
         if m_from_object > m_to_object:
@@ -913,12 +898,10 @@ class moment(object):
         if metric is None:
             return self.__gt__(m_from_object) and self.__lt__(m_to_object)
         else:
-            if start_flag:
-                this_object = self.startOf(metric)
-                return (this_object > m_from_object) and (this_object < m_to_object)
-            else:
-                this_object = self.endOf(metric)
-                return (this_object > m_from_object) and (this_object < m_to_object)
+            m_from_object = m_from_object.startOf(metric)
+            m_to_object = m_to_object.startOf(metric)
+            this_object = self.startOf(metric)
+            return (this_object > m_from_object) and (this_object < m_to_object)
 
     def isLeapYear(self):
         return calendar.isleap(self._d.year)

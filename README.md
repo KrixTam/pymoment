@@ -550,64 +550,86 @@ The followings should get the same result.
 > moment().isBefore(moment|str|datetime|list)
 > 
 > moment().isBefore(moment|str|datetime|list, str)
-> 
-> moment().isBefore(moment|str|datetime|list, str, bool)
 
 Check if a moment is before another moment. The first argument will be parsed as a moment, if not already so.
 
 > moment('2010-10-20').isBefore('2010-10-21')  # True
 
-If the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass the units as the second parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+As the second parameter determines the precision, and not just a single value to check, using day will check for year, month and day.
 
 > moment('2010-10-20').isBefore('2010-12-31', 'year')  # False
 > 
-> moment('2010-10-20').isBefore('2010-12-31', 'year', True)  # True
+> moment('2010-10-20').isBefore('2011-01-01', 'year')  # True
 
 Like *moment.isAfter* and *moment.isSame*, any of the units of time that are supported for *moment.startOf* are supported for *moment.isBefore*.
 
-> year quarter month week isoWeek day date hour minute second
+> year month week isoWeek day hour minute second
+
+If nothing is passed to moment#isBefore, it will default to the current time.
 
 ### Is Same
 
 > moment().isSame(moment|str|datetime|list)
 > 
 > moment().isSame(moment|str|datetime|list, str)
-> 
-> moment().isSame(moment|str|datetime|list, str, bool)
 
 Check if a moment is the same as another moment. The first argument will be parsed as a moment, if not already so.
 
 > moment('2010-10-20').isSame('2010-10-20')  # True
 
-Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass it as the second parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+> moment('2010-10-20').isSame('2009-12-31', 'year')  # False
+> 
+> moment('2010-10-20').isSame('2010-01-01', 'year')  # True
+> 
+> moment('2010-10-20').isSame('2010-12-31', 'year')  # True
+> 
+> moment('2010-10-20').isSame('2011-01-01', 'year')  # False
+
+When including a second parameter, it will match all units equal or larger. Passing in month will check month and year. Passing in day will check day, month, and year.
+
+> moment('2010-01-01').isSame('2011-01-01', 'month')  # False, different year
+> 
+> moment('2010-01-01').isSame('2010-02-01', 'day')  # False, different month
+
+Like *moment.isAfter* and *moment.isBefore*, any of the units of time that are supported for *moment.startOf* are supported for *moment.isSame*.
+
+> year month week isoWeek day hour minute second
 
 ### Is After
 
 > moment().isAfter(moment|str|datetime|list)
 > 
 > moment().isAfter(moment|str|datetime|list, str)
-> 
-> moment().isAfter(moment|str|datetime|list, str, bool)
 
 Check if a moment is after another moment. The first argument will be parsed as a moment, if not already so.
 
 > moment('2010-10-20').isAfter('2010-10-19')  # True
 
-Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass the units as the second parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+As the second parameter determines the precision, and not just a single value to check, using day will check for year, month and day.
+
+> moment('2010-10-20').isAfter('2010-01-01', 'year')  # False
+> 
+> moment('2010-10-20').isAfter('2009-12-31', 'year')  # True
+
+Like *moment.isSame* and *moment.isBefore*, any of the units of time that are supported for *moment.startOf* are supported for *moment.isAfter*.
+
+> year month week isoWeek day hour minute second
+
+If nothing is passed to *moment.isAfter*, it will default to the current time.
+
+> moment().isAfter()  # False
 
 ### Is Same or Before
 
 > moment().isSameOrBefore(moment|str|datetime|list)
 > 
 > moment().isSameOrBefore(moment|str|datetime|list, str)
-> 
-> moment().isSameOrBefore(moment|str|datetime|list, str, bool)
 
 Check if a moment is before or the same as another moment. The first argument will be parsed as a moment, if not already so.
 
@@ -615,27 +637,27 @@ Check if a moment is before or the same as another moment. The first argument wi
 > 
 > moment('2010-10-20').isSameOrBefore('2010-10-20')  # True
 > 
-> moment('2010-10-20').isSameOrBefore('2010-10-19')  # True
+> moment('2010-10-20').isSameOrBefore('2010-10-19')  # False
 
-Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass the units as the second parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+As the second parameter determines the precision, and not just a single value to check, using day will check for year, month and day.
 
-> a = moment('2021-04-22 04:02:09.957000 +0800')
+> moment('2010-10-20').isBefore('2010-12-31', 'year')  # False
 > 
-> b = moment('2021-2-2 13:02:09.957000 +0800')
-> 
-> a.isSameOrBefore(b, 'year')  # False
-> 
-> a.isSameOrBefore(b, 'year', True)  #True
+> moment('2010-10-20').isBefore('2011-01-01', 'year')  # True
+
+Like *moment.isAfter* and *moment.isSame*, any of the units of time that are supported for *moment.startOf* are supported for *moment.isBefore*.
+
+> year month week isoWeek day hour minute second
+
+If nothing is passed to moment#isBefore, it will default to the current time.
 
 ### Is Same or After
 
 > moment().isSameOrAfter(moment|str|datetime|list)
 > 
 > moment().isSameOrAfter(moment|str|datetime|list, str)
-> 
-> moment().isSameOrAfter(moment|str|datetime|list, str, bool)
 
 Check if a moment is after or the same as another moment. The first argument will be parsed as a moment, if not already so.
 
@@ -645,25 +667,25 @@ Check if a moment is after or the same as another moment. The first argument wil
 > 
 > moment('2010-10-20').isSameOrAfter('2010-10-21')  # False
 
-Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass the units as the second parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+As the second parameter determines the precision, and not just a single value to check, using day will check for year, month and day.
 
-> a = moment('2021-04-22 04:02:09.957000 +0800')
+> moment('2010-10-20').isSameOrAfter('2011-12-31', 'year')  # False
 > 
-> b = moment('2021-2-2 13:02:09.957000 +0800')
+> moment('2010-10-20').isSameOrAfter('2010-01-01', 'year')  # True
 > 
-> a.isSameOrAfter(b, 'year')  # True
-> 
-> a.isSameOrAfter(b, 'year', True)  # False
+> moment('2010-10-20').isSameOrAfter('2009-12-31', 'year')  # True
+
+Like moment#isSame and moment#isBefore, any of the units of time that are supported for moment#startOf are supported for moment#isSameOrAfter:
+
+> year month week isoWeek day hour minute second
 
 ###Is Between
 
 > moment().isBetween(moment|str|datetime|list, moment|str|datetime|list)
 > 
 > moment().isBetween(moment|str|datetime|list, moment|str|datetime|list, str)
-> 
-> moment().isBetween(moment|str|datetime|list, moment|str|datetime|list, str, bool)
 
 Check if a moment is between two other moments, optionally looking at unit scale (minutes, hours, days, etc). The match is exclusive. The first two arguments will be parsed as moments, if not already so.
 
@@ -675,19 +697,15 @@ Note that the order of the two arguments **do not** matter.
 
 > moment('2010-10-20').isBetween('2010-10-25', '2010-10-19')  # True
 
-Like *moment.isBefore*, if the unit is passed as the second parameter, and the start of a unit of time or the end of a unit of time would be used to be compared.
+If you want to limit the granularity to a unit other than milliseconds, pass the units as the third parameter.
 
-The third parameter is used to determine using *startOf* or *endOf* time of the moment instance. Default is *False* which means using *endOf* time of the moment instance.
+> moment('2010-10-20').isBetween('2010-01-01', '2012-01-01', 'year')  # False
+> 
+> moment('2010-10-20').isBetween('2009-12-31', '2012-01-01', 'year')  # True
 
-> a = moment('20210426')
-> 
-> b = moment('20210429')
-> 
-> c = moment('20210502')
-> 
-> a.isBetween(b, c, 'week')  # True
-> 
-> b.isBetween(a, c, 'week', True)  # False
+Like *moment.isSame*, *moment.isBefore*, *moment.isAfter* any of the units of time that are supported for *moment.startOf* are supported for *moment.isBetween*.
+
+> year month week isoWeek day hour minute second
 
 ### Is Leap Year
 

@@ -189,25 +189,25 @@ class TestGetAndSet(unittest.TestCase):
         with self.assertRaises(TypeError):
             a = moment('2021-4-2 04:02:09.957031 +0800')
             if a > 1:
-                pass
+                pass  # pragma: no cover
 
     def test_not_implement_02(self):
         with self.assertRaises(TypeError):
             a = moment('2021-4-2 04:02:09.957031 +0800')
             if a >= 1:
-                pass
+                pass  # pragma: no cover
 
     def test_not_implement_03(self):
         with self.assertRaises(TypeError):
             a = moment('2021-4-2 04:02:09.957031 +0800')
             if a < 1:
-                pass
+                pass  # pragma: no cover
 
     def test_not_implement_04(self):
         with self.assertRaises(TypeError):
             a = moment('2021-4-2 04:02:09.957031 +0800')
             if a <= 1:
-                pass
+                pass  # pragma: no cover
 
     def test_not_implement_05(self):
         a = moment('2021-4-2 04:02:09.957031 +0800')
@@ -254,4 +254,4 @@ class TestGetAndSet(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main()  # pragma: no cover

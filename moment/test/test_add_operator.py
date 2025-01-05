@@ -30,7 +30,7 @@ class TestAddOperator(unittest.TestCase):
         b = moment('20201228') + timedelta(hours=13)
         self.assertEqual(a, b)
 
-    def test_hour(self):
+    def test_week(self):
         a = moment('20201228').add(5, 'w')
         b = moment('20201228') + timedelta(weeks=5)
         self.assertEqual(a, b)
@@ -42,4 +42,4 @@ class TestAddOperator(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main()  # pragma: no cover
